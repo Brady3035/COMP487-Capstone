@@ -1,3 +1,6 @@
+# TODO byte to wav, data to song
+
+
 import wave
 
 # Uses built in wave library to pull byte code out
