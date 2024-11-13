@@ -1,7 +1,11 @@
-from typing import Self
-import numpy as np
-import hashlib
 
+import numpy as np
+
+
+##TODO: research methods and finalize  this class to meet scope and aim of project
+##Coerce logical and operation to byte_array for comparisons
+##Feel free to edit style/functionality of any of the class, add changes up here
+##Ensure compatability with Scrambler class, as these two interface with each other often
 
 
 
@@ -21,7 +25,8 @@ class code_Manager:
             self.code_match()
         def code_match(self):
             ##Current Code construction is basic collusion detection, possibly could be implemented as error correcting code, gaussian vectors,
-            # or entropy based codes.  Returns a dictionary that maps each code to an identification pair 
+            # or entropy based codes.  Returns a dictionary that maps each code to an identification pair
+            # Not used for current example, but could be used later 
             
             for i in range(1,self.code_size):
                  for j in range(1,self.code_size):
@@ -34,6 +39,8 @@ class code_Manager:
             else:
                 self.identities[id]=self.num_identities
                 self.num_identities+=1
+
+
         def identify_leaker(self,leaked_code):
             ##Identifies Leaker using self.identification_to_codes given an extracted code vector (leaked_code).
             if len(self.identities) == 0 or len(self.collusion_matrix) ==0:
@@ -45,14 +52,16 @@ class code_Manager:
                     leaker =list(self.identities.keys())[list(self.identities.values()).index(i)] ## Finds key(id) given value(index) 
             return leaker
 
+
         def find_colluders(self,leaked_code):
-            colluders =""
-            for i in leaked_code:
-                if i == False:
-                    colluders += " ," + list(self.identities.keys())[list(self.identities.values()).index(i)]
+            colluders ="leakers: "
+            for i in range(len(leaked_code)):
+                
+                if leaked_code[i] == False:
+                    colluders +=  list(self.identities.keys())[list(self.identities.values()).index(i)] +" "
 
                     
-                    return colluders
+            return colluders 
         def get_code_from_Id(self,id):
             ## PARAM string id (identification), returns the code associated with the given user
             return self.collusion_matrix[self.identities[id]]
@@ -73,6 +82,10 @@ def main():
     print(c.identify_leaker(c.get_code_from_Id("jay")))
     c.fingerprint_code("nurain")
     print(c.identify_leaker(c.get_code_from_Id("nurain")))
+    c.fingerprint_code("brady")
+    print(c.find_colluders([False,True,False,True,True,True,True,True,True,True]))
+    print(c.find_colluders([True,False,True,True,True,True,True,True,True,True]))
+
     
 
     
