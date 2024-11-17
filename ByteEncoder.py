@@ -1,3 +1,5 @@
+from typing import *
+
 def text_to_binary(input_text_file, output_binary_file):
     try:
         # Open the input text file in read mode and the output binary file in write mode
@@ -36,7 +38,32 @@ def binary_to_text(input_binary_file, output_text_file):
     except Exception as e:
         print(f"An error occurred: {e}")
 
-def hide_message_in_binary(input_binary_file, output_binary_file, secret_message):
+def hide_message_in_binary(byte_chars: ByteString, secret_message) -> ByteString:
+
+    # Convert the secret message to a binary string
+    binary_message = ''.join(format(ord(char), '08b') for char in secret_message)
+    binary_chars = ''.join(format(byte, '08b') for byte in byte_chars)
+    message_length = len(binary_message)
+    # Check if the binary content has enough characters to hide the message
+    if message_length > len(binary_chars):
+        raise ValueError("Secret message is too long to hide in the binary file.")
+    # Embed the message in the LSB of each character's binary representation
+    modified_binary_chars = []
+    for i, binary_char in enumerate(binary_chars):
+        if i < message_length:
+            # Replace the last bit with the message bit
+            modified_char = binary_char[:-1] + binary_message[i]
+        else:
+            # Keep the original binary character
+            modified_char = binary_char
+        modified_binary_chars.append(modified_char)
+    # Join the modified binary characters and encode to binary format
+    binary_str = ''.join(modified_binary_chars)
+    print(binary_str[0:10])
+    modified_binary_content = bytearray([int(binary_str[i:i+8], 2) for i in range(0,len(binary_str),8)])
+    return modified_binary_content
+
+def hide_message_in_binary_file(input_binary_file, output_binary_file, secret_message):
     try:
         # Convert the secret message to a binary string
         binary_message = ''.join(format(ord(char), '08b') for char in secret_message)
