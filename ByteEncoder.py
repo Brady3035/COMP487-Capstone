@@ -49,17 +49,11 @@ def hide_message_in_binary(byte_chars: ByteString, secret_message) -> ByteString
         raise ValueError("Secret message is too long to hide in the binary file.")
     # Embed the message in the LSB of each character's binary representation
     modified_binary_chars = []
-    for i, binary_char in enumerate(binary_chars):
-        if i < message_length:
-            # Replace the last bit with the message bit
-            modified_char = binary_char[:-1] + binary_message[i]
-        else:
-            # Keep the original binary character
-            modified_char = binary_char
-        modified_binary_chars.append(modified_char)
+    for i, binary_char in enumerate(binary_chars[0:message_length]):
+        modified_binary_chars.append(binary_char[:-1] + binary_message[i])
+    modified_binary_chars.extend(binary_chars[message_length:])
     # Join the modified binary characters and encode to binary format
     binary_str = ''.join(modified_binary_chars)
-    print(binary_str[0:10])
     modified_binary_content = bytearray([int(binary_str[i:i+8], 2) for i in range(0,len(binary_str),8)])
     return modified_binary_content
 
@@ -103,7 +97,7 @@ def hide_message_in_binary_file(input_binary_file, output_binary_file, secret_me
         print(f"An error occurred: {e}")
 
 
-def extract_message_from_binary(input_binary_file, message_length):
+def extract_message_from_binary_file(input_binary_file, message_length):
     try:
         with open(input_binary_file, 'rb') as bin_file:
             # Read the binary content and decode it to a string
@@ -123,6 +117,13 @@ def extract_message_from_binary(input_binary_file, message_length):
     except Exception as e:
         print(f"An error occurred: {e}")
 
+def extract_message_from_binary(byte_chars, message_length): 
+    binary_str = ''.join(format(byte, '08b') for byte in byte_chars)
+    binary_list = list(binary_str)
+    # Extract the least significant bit from each character up to the message length
+    # Convert the extracted bits to characters (8 bits at a time)
+    hidden_message = ''.join(chr(int(''.join(binary_list[i:i + 8]), 2)) for i in range(0, message_length*8, 8))
+    return hidden_message
 
 if __name__ == '__main__':
     # First, convert text to binary file

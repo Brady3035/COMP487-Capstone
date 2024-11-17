@@ -9,23 +9,11 @@ class audio_file:
     def __init__(self, input_file):
         self.input_file = input_file
         with wave.open(self.input_file, 'rb') as wav_file:
-            self.input_bytes = wav_file.readframes(wav_file.getnframes())
+            self.input_data = wav_file.readframes(wav_file.getnframes())
             self.params = wav_file.getparams()
-        self.header = self.input_bytes[:45]
-        self.input_data = self.input_bytes[44:]
 
-
-    # Uses built in wave library to pull byte code out
-    def get_bytes(self):
-        return self.input_bytes
-
-    #  Cuts the header off the file, so we can have just the song data
     def get_data(self):
         return self.input_data
-
-    # Returns the header to later be appended to the audio file
-    def get_header(self):
-        return self.header
 
     def write_output(self, output_data, write_file):
         with wave.open(write_file, 'wb') as wav_file:
